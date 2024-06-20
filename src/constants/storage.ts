@@ -1,0 +1,8 @@
+export const LOCAL_STORAGE_TOKEN = 'ACCESS_TOKEN';
+
+export const LOCAL_STORAGE_I18N = 'I18N';
+
+export const LOCAL_STORAGE_NEW_USER = 'NEW_USER';
+export const LOCAL_STORAGE_PROFILE = 'PROFILE';
+
+export const LOCAL_STORAGE_EXPLORE_TAG = 'EXPLORE_TAG';

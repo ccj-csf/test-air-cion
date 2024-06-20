@@ -1,0 +1,16 @@
+{
+  "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
+  "tailwindFunctions": ["classNames"],
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "import/no-unused-modules": true,
+  "overrides": [
+    {
+      "files": "export.+(ts|tsx)",
+      "options": {
+        "printWidth": 180
+      }
+    }
+  ]
+}
