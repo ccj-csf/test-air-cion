@@ -1,7 +1,7 @@
 'use client';
 import { useDebounceFn } from 'ahooks';
 import Image from 'next/image';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import CoinComponent from './CoinComponent';
 interface ImageProps {
   url: string;
@@ -15,6 +15,7 @@ interface ImageSliderProps {
   onClick?: (image: ImageProps) => void;
   onStatsUpdate: (coins: number) => void;
   disableAnimation: boolean;
+  windLv?: number;
 }
 
 const ImageSlider: React.FC<ImageSliderProps> = ({
@@ -23,6 +24,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   onClick,
   onStatsUpdate,
   disableAnimation,
+  windLv,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +45,20 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       wait: 50,
     },
   );
+  const incrementValue = useMemo(() => {
+    const map: { [index: number]: number } = {
+      1: 1,
+      2: 3,
+      3: 5,
+      4: 10,
+      5: 15,
+    };
+    if (windLv !== undefined) {
+      return map[windLv];
+    } else {
+      return 1;
+    }
+  }, [windLv]);
 
   return (
     <div
@@ -64,6 +80,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
             coinImagePath={image.url}
             onStatsUpdate={onStatsUpdate}
             disableAnimation={disableAnimation}
+            incrementValue={incrementValue}
           ></CoinComponent>
           {image.isClocked && (
             <Image

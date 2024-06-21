@@ -1,10 +1,10 @@
 'use client';
 
 import { BaseProgress, Icon } from '@/components';
-import { ROUTES_BOOSTS, ROUTES_USER_LEVEL } from '@/constants';
+import { ROUTES_BOOSTS, ROUTES_USER_LEVEL, USER_LEVEL } from '@/constants';
 import { formatNumberWithCommas } from '@/utils';
 // import { initInitData } from '@tma.js/sdk';
-import { throttle } from 'lodash-es';
+import { debounce } from 'lodash-es';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -30,6 +30,7 @@ interface IPointUser {
   turboKey: number;
   modifyDt: number;
   energyLeft: number;
+  userLevel: string;
 }
 
 const Container = () => {
@@ -65,24 +66,28 @@ const Container = () => {
     modifyDt: number,
     initialEnergy: number,
     energyLimitLv = 1000,
-    userLevel: number = 1,
+    rechargeSpeedLv: number = 1,
   ) => {
     const now = Date.now();
-    const elapsedSeconds = Math.floor((now - modifyDt) / 2000); // 计算经过的时间段
-    const energyIncrement = getEnergyIncrementByLevel(userLevel); // 根据用户等级获取每两秒增加的能量值
+    const elapsedSeconds = Math.floor((now - modifyDt) / 1000); // 计算经过的时间段
+    const energyIncrement = getEnergyIncrementByLevel(rechargeSpeedLv); // 根据用户等级获取每两秒增加的能量值
     const newEnergy = Math.min(initialEnergy + elapsedSeconds * energyIncrement, energyLimitLv); // 更新能量值，但不超过最大限制
     return newEnergy;
   };
 
   // 根据用户等级确定每两秒钟能量增加的数量
-  const getEnergyIncrementByLevel = (level: number = 1) => {
-    switch (level) {
+  const getEnergyIncrementByLevel = (rechargeSpeedLv: number = 1) => {
+    switch (rechargeSpeedLv) {
       case 1:
-        return 1; // 等级 1 用户每两秒增加 1 点能量
+        return 1; // 等级 1 用户每1秒增加 1 点能量
       case 2:
-        return 2; // 等级 2 用户每两秒增加 2 点能量
+        return 3; // 等级 2 用户每1秒增加 3 点能量
       case 3:
-        return 3; // 等级 3 用户每两秒增加 3 点能量
+        return 5; // 等级 3 用户每1秒增加 5 点能量
+      case 4:
+        return 10; // 等级 4 用户每1秒增加 10 点能量
+      case 5:
+        return 15; // 等级 5 用户每1秒增加 15 点能量
       default:
         return 1; // 默认增加值
     }
@@ -99,6 +104,7 @@ const Container = () => {
     };
   }, [pointUser, score, threshold]);
   useEffect(() => {
+    window.Telegram?.WebApp?.expand();
     const savedData = localStorage.getItem('pointUserData');
     if (savedData) {
       const data = JSON.parse(savedData);
@@ -117,27 +123,25 @@ const Container = () => {
           totalPoints: 0,
           seqNo: '12345789',
           energyLimitLv: 1000,
-          rechargeSpeedLv: 1,
-          windLv: 1,
+          rechargeSpeedLv: Math.floor(Math.random() * (5 - 1 + 1)) + 1,
+          windLv: Math.floor(Math.random() * (5 - 1 + 1)) + 1,
           fullEnergyKey: 'fullEnergyKey',
           turboKey: 0,
           modifyDt: Date.now() - 2000 * 1000,
           energyLeft: 0,
+          userLevel: 'Stubborn Bronze',
         };
-
-        // 模拟请求成功
         resolve(newData);
-
-        // 如需模拟请求失败，可使用 reject(new Error("Failed to fetch data"));
-      }, 1500); // 设置延迟时间为2000毫秒（2秒）
+      }, 1500);
     })
       .then((data) => {
         console.log('data :>> ', data);
-        // 更新状态
-        // setPointUser(data);
-        // setScore(data.totalPoints);
-        // setThreshold(data.energyLeft);
-        const newEnergyLeft = updateEnergy(data.modifyDt, data.energyLeft, data.energyLimitLv);
+        const newEnergyLeft = updateEnergy(
+          data.modifyDt,
+          data.energyLeft,
+          data.energyLimitLv,
+          data.rechargeSpeedLv,
+        );
         console.log('newEnergyLeft :>> ', newEnergyLeft);
         setPointUser({
           ...data,
@@ -156,35 +160,6 @@ const Container = () => {
       });
   };
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     const data = {
-  //       tgId: '12345456789123',
-  //       totalPoints: 0,
-  //       seqNo: '12345789',
-  //       energyLimitLv: 1000,
-  //       rechargeSpeedLv: 1,
-  //       windLv: 1,
-  //       fullEnergyKey: 'fullEnergyKey',
-  //       turboKey: 0,
-  //       modifyDt: Date.now() - 1998 * 1000,
-  //       energyLeft: 0,
-  //     };
-
-  //     const newEnergyLeft = updateEnergy(data.modifyDt, data.energyLeft, data.energyLimitLv);
-  //     setPointUser({
-  //       ...data,
-  //       energyLeft: newEnergyLeft,
-  //     });
-  //     setThreshold(newEnergyLeft);
-  //     if (pointUser && typeof pointUser.totalPoints === 'number') {
-  //       setScore(pointUser.totalPoints);
-  //     } else {
-  //       setScore(0);
-  //     }
-  //   }, 500);
-  // }, []);
-
   // 最大阈值
   const disableAnimation = useMemo(() => {
     // 获取分数
@@ -195,7 +170,7 @@ const Container = () => {
     }
   }, [threshold]);
   const throttledSubmitScore = useCallback(
-    throttle(() => {
+    debounce(() => {
       if (accumulatedScore > 0) {
         console.log('Submitting score to the server:', accumulatedScore);
         setAccumulatedScore(0);
@@ -228,7 +203,7 @@ const Container = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (lastScore === score) {
-        const increment = getEnergyIncrementByLevel(pointUser?.rechargeSpeedLv || 1);
+        const increment = getEnergyIncrementByLevel(pointUser?.rechargeSpeedLv) * 2;
         setThreshold((prev) =>
           Math.min(prev + increment, pointUser?.energyLimitLv || Number.MAX_SAFE_INTEGER),
         );
@@ -277,9 +252,18 @@ const Container = () => {
       </header>
 
       <section className="flex items-center space-x-2" onClick={goUserLevelPage}>
-        <Image src="/images/diamond.png" alt="operating area" width={20} height={26} />
-        <span className="text-16">Diamond</span>
-        <Icon name="right-arrow" className="!text-12px text-gray-700"></Icon>
+        {pointUser?.userLevel && (
+          <>
+            <Image
+              src={USER_LEVEL[pointUser?.userLevel].icon}
+              alt="operating area"
+              width={20}
+              height={26}
+            />
+            <span className="text-16">{USER_LEVEL[pointUser?.userLevel].desc}</span>
+            <Icon name="right-arrow" className="!text-12px text-gray-700"></Icon>
+          </>
+        )}
       </section>
       <section className="w-full">
         <ImageSlider
@@ -289,6 +273,7 @@ const Container = () => {
           }}
           disableAnimation={disableAnimation}
           onStatsUpdate={onStatsUpdate}
+          windLv={pointUser?.windLv}
         ></ImageSlider>
       </section>
       <FullscreenVideoModal

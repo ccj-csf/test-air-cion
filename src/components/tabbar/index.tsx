@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FC, memo } from 'react';
+import './index.css';
 
 export interface TabbarProps extends NativeProps {}
 const Tabbar: FC<TabbarProps> = memo((props) => {
@@ -27,7 +28,8 @@ const Tabbar: FC<TabbarProps> = memo((props) => {
 
   return withNativeProps(
     props,
-    <div className="z-100 fixed bottom-0 left-0 flex h-[50px] w-full items-center  justify-between bg-black py-6">
+    // <div className="z-100 fixed bottom-0 left-0 flex h-[50px] w-full items-center  justify-between bg-black py-6">
+    <div className="tabbar-container">
       {renderIcon('main')}
       {renderIcon('social')}
       {renderIcon('map')}

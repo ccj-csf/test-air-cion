@@ -86,9 +86,13 @@ const CoinComponent: React.FC<IProps> = ({
   const lastAnimationTime = useRef(0);
   const lastSoundTime = useRef(Date.now());
   const [stream, setStream] = useState<MediaStream | null>(null);
-
+  const currentIncrementValue = useRef(incrementValue);
   const controls = useAnimation();
   const windControls = useAnimation();
+
+  useEffect(() => {
+    currentIncrementValue.current = incrementValue;
+  }, [incrementValue]);
 
   const initAudio = async () => {
     try {
@@ -123,8 +127,8 @@ const CoinComponent: React.FC<IProps> = ({
           }
 
           if (coinTextCount > 0) {
-            // console.log('normalizedVolume :>> ', normalizedVolume);
-            setCoins((prevCoins) => prevCoins + coinTextCount * incrementValue * 2);
+            // console.log('currentIncrementValue :>> ', currentIncrementValue.current);
+            setCoins((prevCoins) => prevCoins + coinTextCount * currentIncrementValue.current * 2);
             setShowCoinText(coinTextCount);
             setTimeout(() => setShowCoinText(0), showTextTimeout);
             lastAnimationTime.current = currentTime;
