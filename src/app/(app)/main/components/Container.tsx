@@ -7,7 +7,7 @@ import { formatNumberWithCommas } from '@/utils';
 import { debounce } from 'lodash-es';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import FullscreenVideoModal from './FullscreenVideoModal';
 import ImageSlider from './ImageSlider';
 const defaultCoinBg = '/images/coin1-bg.png';
@@ -104,7 +104,6 @@ const Container = () => {
     };
   }, [pointUser, score, threshold]);
   useEffect(() => {
-    window.Telegram?.WebApp?.expand();
     const savedData = localStorage.getItem('pointUserData');
     if (savedData) {
       const data = JSON.parse(savedData);
@@ -113,6 +112,9 @@ const Container = () => {
       setThreshold(data.energyLeft);
     }
     fetchPointUserData(); // 同步请求后端数据
+  }, []);
+  useLayoutEffect(() => {
+    window.Telegram?.WebApp?.expand();
   }, []);
   // 模拟异步请求后端的数据
   const fetchPointUserData = () => {
