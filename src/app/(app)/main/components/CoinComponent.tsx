@@ -97,6 +97,8 @@ const CoinComponent: React.FC<IProps> = ({
 
   const initAudio = async () => {
     try {
+      // const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+      // console.log('permissionStatus :>> ', permissionStatus);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setStream(stream);
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
