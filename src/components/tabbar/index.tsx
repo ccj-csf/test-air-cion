@@ -2,18 +2,22 @@
 import { NativeProps, withNativeProps } from '@/utils';
 import { useMemoizedFn } from 'ahooks';
 import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { FC, memo } from 'react';
 
 export interface TabbarProps extends NativeProps {}
 const Tabbar: FC<TabbarProps> = memo((props) => {
   const pathname = usePathname();
+  const router = useRouter();
   const renderIcon = useMemoizedFn((name: string) => {
     const path = `/${name}`;
 
+    const handleClick = () => {
+      window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('heavy');
+      router.push(path);
+    };
     return (
-      <Link href={path} className="flex flex-col px-[23px] ">
+      <div className="flex flex-col px-[23px]" onClick={handleClick}>
         <Image
           src={!pathname.includes(path) ? `/icons/${name}.svg` : `/icons/${name}-active.svg`}
           width={32}
@@ -21,7 +25,7 @@ const Tabbar: FC<TabbarProps> = memo((props) => {
           alt="tabbar"
           className="mt-[2px]"
         />
-      </Link>
+      </div>
     );
   });
 

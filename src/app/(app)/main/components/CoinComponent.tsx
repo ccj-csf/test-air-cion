@@ -131,7 +131,6 @@ const CoinComponent: React.FC<IProps> = ({
             // console.log('currentIncrementValue :>> ', currentIncrementValue.current);
             setCoins((prevCoins) => prevCoins + coinTextCount * currentIncrementValue.current * 2);
             window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('heavy');
-            console.log('1111111 :>> ', 1111111);
             // window.Telegram.WebApp.HapticFeedback.impactOccurred()
             setShowCoinText(coinTextCount);
             setTimeout(() => setShowCoinText(0), showTextTimeout);
