@@ -89,6 +89,7 @@ const CoinComponent: React.FC<IProps> = ({
   const currentIncrementValue = useRef(incrementValue);
   const controls = useAnimation();
   const windControls = useAnimation();
+  const requestRef = useRef<number>();
 
   useEffect(() => {
     currentIncrementValue.current = incrementValue;
@@ -129,8 +130,10 @@ const CoinComponent: React.FC<IProps> = ({
           if (coinTextCount > 0) {
             // console.log('currentIncrementValue :>> ', currentIncrementValue.current);
             setCoins((prevCoins) => prevCoins + coinTextCount * currentIncrementValue.current * 2);
-            setShowCoinText(coinTextCount);
             window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('heavy');
+            console.log('1111111 :>> ', 1111111);
+            // window.Telegram.WebApp.HapticFeedback.impactOccurred()
+            setShowCoinText(coinTextCount);
             setTimeout(() => setShowCoinText(0), showTextTimeout);
             lastAnimationTime.current = currentTime;
 
@@ -156,7 +159,7 @@ const CoinComponent: React.FC<IProps> = ({
           }
         }
 
-        requestAnimationFrame(updateVolume);
+        requestRef.current = requestAnimationFrame(updateVolume);
       };
 
       updateVolume();
@@ -184,6 +187,7 @@ const CoinComponent: React.FC<IProps> = ({
   useEffect(() => {
     initAudio();
     return () => {
+      cancelAnimationFrame(requestRef.current!);
       audioContext?.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

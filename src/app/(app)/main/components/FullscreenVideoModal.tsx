@@ -1,5 +1,5 @@
 'use client';
-import { ShieldQuestion } from 'lucide-react';
+import { CircleHelp } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import ReactPlayer from 'react-player';
 
@@ -31,7 +31,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({ videoUrl, i
   return (
     <div>
       <section className="font-500 fixed bottom-20 right-4 text-14" onClick={handleOpenVideo}>
-        <ShieldQuestion size={36} />
+        <CircleHelp size={36} color="#eeefff" />
       </section>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
