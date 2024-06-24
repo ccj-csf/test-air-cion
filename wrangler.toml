@@ -107,8 +107,8 @@ NEXT_PUBLIC_TG_MINIAPP_URL="https://t.me/xxx" # telegram miniapp url
 
 [[env.production.d1_databases]]
 binding = "DB"
-database_name = "telegram-miniapp-template"
-database_id = "c9c45843-c867-40b0-8cac-35397c5aa741"
+database_name = "ccj-test-aircon"
+database_id = "87d24337-d228-405f-8272-6590795a8e04"
 
 # [[env.production.kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
