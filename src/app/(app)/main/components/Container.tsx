@@ -227,6 +227,7 @@ const Container = () => {
       }}
     >
       <section className="mt-8 w-full px-4">
+        <h1>ccj-test</h1>
         <div className="flex w-full  items-center  justify-between text-20">
           <div className="flex items-center space-x-2">
             <Image src="/images/lightning.png" alt="lightning " width={20} height={26} />
